@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>AES Encrypt/Decrypt Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+
+        input,
+        button {
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        label {
+            margin-top: 1rem;
+            display: block;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>AES Encrypt & Decrypt Demo</h1>
+
+    <label for="key">Key (16 characters):</label>
+    <input type="text" id="key" value="" maxlength="16" />
+
+    <label for="jsonData">JSON Data to Encrypt:</label>
+    <textarea id="jsonData"></textarea>
+
+    <button onclick="encryptData()">Encrypt</button>
+
+    <label for="encryptedOutput">Encrypted Base64 Output:</label>
+    <textarea id="encryptedOutput"></textarea>
+
+    <button onclick="decryptData()">Decrypt</button>
+
+    <label for="decryptedOutput">Decrypted JSON Output:</label>
+    <pre id="decryptedOutput"></pre>
+
+    <script>
+        function encryptData() {
+            const keyText = document.getElementById('key').value;
+            const jsonText = document.getElementById('jsonData').value;
+
+            if (keyText.length !== 16) {
+                alert('Key must be exactly 16 characters');
+                return;
+            }
+
+            try {
+                const key = CryptoJS.enc.Utf8.parse(keyText);
+                const encrypted = CryptoJS.AES.encrypt(jsonText, key, {
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+
+                document.getElementById('encryptedOutput').value = encrypted.toString();
+                document.getElementById('decryptedOutput').textContent = '';
+            } catch (e) {
+                alert('Encryption error: ' + e.message);
+            }
+        }
+
+        function decryptData() {
+            const keyText = document.getElementById('key').value;
+            const encryptedBase64 = document.getElementById('encryptedOutput').value;
+
+            if (keyText.length !== 16) {
+                alert('Key must be exactly 16 characters');
+                return;
+            }
+
+            try {
+                const key = CryptoJS.enc.Utf8.parse(keyText);
+                const decrypted = CryptoJS.AES.decrypt(encryptedBase64, key, {
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+
+                const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+                document.getElementById('decryptedOutput').textContent = decryptedText || 'Decryption failed';
+            } catch (e) {
+                alert('Decryption error: ' + e.message);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
